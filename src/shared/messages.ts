@@ -1,0 +1,4 @@
+import type {AppState,FocusMode,ResetState,SiteContext} from './types';
+export type Request = {type:'GET_STATE'}|{type:'START';topic:string;minutes:number;mode:FocusMode}|{type:'PAUSE'|'RESUME'|'END'}|{type:'INTERVENE';sessionId:string;context:SiteContext}|{type:'ACTION';eventId:string;action:'GO_BACK'|'CONTINUE_ANYWAY'|'CONTINUE';returnUrl?:string}|{type:'GET_RESET';tabId:number}|{type:'FINISH_RESET';tabId:number};
+export interface Response {ok:boolean;error?:string;state?:AppState;eventId?:string;readyAt?:number;reset?:ResetState}
+export async function send(request:Request):Promise<Response>{const response=await chrome.runtime.sendMessage(request) as Response|undefined;if(!response?.ok)throw new Error(response?.error??'Extension unavailable. Reload this page and try again.');return response;}

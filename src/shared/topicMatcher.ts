@@ -1,0 +1,6 @@
+const stop = new Set('study studying learn learning focus on the a an of for and my work working practice revise revision watch understand introduction to basics tutorial lecture'.split(' '));
+const groups = [ ['dbms','database','databases','sql','normalization','transactions','relational'], ['dsa','algorithms','algorithm','structures'], ['ai','artificial','intelligence'], ['ml','machine','learning'], ['math','mathematics','algebra','calculus'], ['physics','mechanics','thermodynamics'], ['chemistry','chemical'], ['biology','genetics'], ['programming','coding','code'] ];
+export function tokens(text:string):string[]{return text.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(t=>t.length>1&&!stop.has(t));}
+export function keywords(text:string):Set<string>{const words=new Set(tokens(text));for(const group of groups)if(group.some(w=>words.has(w)))group.forEach(w=>words.add(w));return words;}
+export function academic(text:string):boolean {const words=keywords(text);return groups.some(g=>g.some(w=>words.has(w)))||/\b(database management systems|history|economics|exam)\b/i.test(text);}
+export function related(topic:string,title:string):boolean{const a=keywords(topic);return tokens(title).some(t=>a.has(t));}

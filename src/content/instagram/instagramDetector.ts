@@ -1,0 +1,2 @@
+import type {SiteSection} from '../../shared/types';
+export function instagramSection(url:URL):SiteSection{const parts=url.pathname.split('/').filter(Boolean);if(parts[0]==='direct')return 'DIRECT_MESSAGES';if(['reel','reels'].includes(parts[0]))return 'REELS';if(parts[0]==='explore')return 'EXPLORE';if(parts.length===0)return 'FEED';if(parts.length===1&&!['accounts','about','legal','p','stories','emails'].includes(parts[0]))return 'PROFILE';return 'UNKNOWN';}
