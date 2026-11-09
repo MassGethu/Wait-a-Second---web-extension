@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# Wait-a-Second---web-extension
-Web extension of the Wait a Second app
-=======
 # Wait a Second
 
 **Don’t block the website. Block the distraction.**
@@ -22,7 +18,7 @@ Start, pause, resume and end from the popup. Timestamp-based timing survives pop
 
 ## Light Mode
 
-An isolated, full-screen overlay offers **Go Back** or **Continue Anyway**. Continue Anyway starts a ten-second wait; only after it finishes does **Continue** unlock. The background validates the deadline. Continuing allows the current URL for the rest of that visit, until a route or session-state change. Videos are paused when an intervention appears; resume playback yourself after continuing.
+An isolated, full-screen overlay offers **Go Back** or **Continue Anyway**. Continue Anyway now opens a goal-specific sentence-retyping step. **Continue** unlocks only when the sentence matches (ignoring case and normalized whitespace). Typing never leaves the overlay or enters storage. Strict Mode still uses its ten-second reset. Continuing allows the current URL for the rest of that visit, until a route or session-state change. Videos are paused when an intervention appears; resume playback yourself after continuing.
 
 ## Strict Mode
 
@@ -51,6 +47,14 @@ Today and rolling last-seven-day views show focus time, attempts, successful red
 
 The storage repository validates core persisted structures. The service worker serializes all writes to prevent multi-tab races. Session history and events are retained for 90 days; active session and per-tab reset records survive restarts. In-progress focus is capped at planned duration. Browser sleep counts as elapsed session time, not proof of attention.
 
+### Doomscroll Counter
+
+Open **Statistics** and enable **Track Reels and Shorts**. Today and This week show viewer time, episodes, and detected transitions for each platform, with separate during-focus and outside-focus totals. Paused focus sessions count as outside focus. The current session also has its own subtotal.
+
+Time accrues in the visible, focused viewer tab and excludes the extension's intervention overlay. It measures viewer time, including paused playback. An episode is counted on the day and in the focus group where it starts. A clip ID change within that episode counts as one detected transition, including a backward move. If a site keeps the same URL as clips change, viewer time still accrues and those clip changes may go uncounted.
+
+To verify, open a viewer without a focus session, wait at least one heartbeat, and change clips. Switch tabs and check that time stops. Repeat during a Light session after continuing past the intervention, then pause the session and check the separate totals. Reopen Chrome to confirm the saved totals persist.
+
 ## Architecture / files
 
 - `src/popup/`: React app and setup, active-session, statistics components.
@@ -66,7 +70,7 @@ The storage repository validates core persisted structures. The service worker s
 
 ## Privacy
 
-No network calls, trackers, analytics SDK, remote fonts, accounts or external services. Inspects supported contexts only while active. Stores focus goals, timestamps, intervention reasons and minimal YouTube title/video identifiers. Instagram events contain high-level sections only. No full-page text, private message content, search queries or cross-site browser history collection. Permissions are only `storage` and `alarms`; content-script matches are restricted to the four supported hosts. Basic tab updates do not require broad `tabs` permission.
+No network calls, trackers, analytics SDK, remote fonts, accounts or external services. Focus classification runs during active sessions. The optional Doomscroll Counter checks supported viewer routes inside and outside focus sessions. It saves aggregate counts and duration for 90 local calendar days and keeps clip identifiers in page memory. The existing focus-intervention history stores goals, timestamps, reasons and minimal YouTube title/video identifiers. Instagram intervention history stores high-level sections. Permissions are `storage` and `alarms`, and content scripts run on the four supported hosts.
 
 ## Installation / Build
 
@@ -92,7 +96,7 @@ Edit source files, run `npm run build`, then reload the extension and target tab
 
 ## First manual test
 
-Start **Study DBMS / 25 min / Light**, then open the specified video. Verify the overlay, choose Continue Anyway, wait ten seconds, press Continue and confirm it stays dismissed on that visit. Then end/start Strict and repeat: only Go Back should appear, followed by the reset and topic search. Finally verify Instagram DMs are allowed and Reels interrupt.
+Start **Study DBMS / 25 min / Light**, then open the specified video. Verify the overlay, choose Continue Anyway, retype the displayed sentence, press Continue and confirm it stays dismissed on that visit. Then end/start Strict and repeat: only Go Back should appear, followed by the reset and topic search. Finally verify Instagram DMs are allowed and Reels interrupt.
 
 ## Current limitations
 
@@ -103,4 +107,11 @@ This is heuristic contextual filtering, not semantic AI. It intentionally misses
 Add site adapters and an optional local model behind the classifier interface, improve title/context confidence, and add explicit user-controlled topic vocabulary. No such future features are presented as currently implemented.
 
 Implementation references: [Chrome content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts), [Chrome alarms](https://developer.chrome.com/docs/extensions/reference/api/alarms).
->>>>>>> 8bf0422 (Pushing the full product v1)
+
+## Presets, schedules and messaging check-ins
+
+Presets and Schedules now have popup views. Two editable defaults are seeded once: Study DBMS / 25 min / Light, and Deep Work / 60 min / Strict. Recurring schedules use local weekdays/time and Chrome alarms. Scheduled sessions require Chrome to be running; late starts use only remaining time, expired slots are skipped, and active or paused sessions take priority. Recent schedule activity is shown in the Schedules view.
+
+Instagram messages remain route-only. A check-in appears after ten visible messaging minutes shared across tabs. Work confirmation adds ten more visible minutes; returning opens the existing inbox destination. Check-in counts are separate from distraction statistics. Neither messages nor retyped input are stored.
+
+Run `npm test` for focused regression and worker integration tests. See [the updated project context](docs/PROJECT_CONTEXT.md#24-chrome-update-retyping-dm-check-ins-presets-and-schedules-5-october-2026) for migration, timing, privacy, decisions and limitations. Reload existing target tabs after updating.

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {ruleBasedClassifier as classifier} from '../src/shared/classifier.ts';
 import {KNOWN_DEMO_VIDEOS} from '../src/shared/knownDemoVideos.ts';
+import {emptyState} from '../src/storage/migration.ts';
 import {remaining} from '../src/shared/timer.ts';
 import {dailyStats} from '../src/storage/statisticsRepository.ts';
 import type {FocusSession,SiteContext} from '../src/shared/types.ts';
@@ -24,6 +25,6 @@ assert.equal(remaining(s,170000),1440000);
 assert.equal(remaining({...s,status:'PAUSED',pauseTimestamp:170000},999999),1440000);
 const midnight=new Date();midnight.setHours(0,0,0,0);const boundary=+midnight;
 const split={...s,startTimestamp:boundary-60000,intervals:[{start:boundary-60000,end:boundary+60000}],status:'COMPLETED' as const,completedAt:boundary+60000};
-const days=dailyStats({activeSession:null,sessionHistory:[split],distractionEvents:[],resets:{}},boundary+120000);
+const days=dailyStats({...emptyState(),activeSession:null,sessionHistory:[split],distractionEvents:[],resets:{}},boundary+120000);
 assert.equal(days[5].minutes,1);assert.equal(days[6].minutes,1);
 console.log('Passed: demo fallback, relevance, unknown title, Instagram sections, pause timing, local-midnight statistics.');
